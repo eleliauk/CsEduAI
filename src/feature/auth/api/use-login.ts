@@ -10,6 +10,7 @@ interface LoginResponse {
   code: number;
   data: {
     redirect_url: string;
+    role: string;
     token: {
       access_token: string;
       expire_in: number;
@@ -20,17 +21,20 @@ interface LoginResponse {
   message: string;
 }
 
-export const useLogin = () => {
+export const useLogin = ({ userType }: { userType: "student" | "teacher" }) => {
   const queryClient = useQueryClient();
   const router = useRouter();
 
   const mutation = useMutation({
     mutationFn: (data: z.infer<typeof loginSchema>) => {
-      return request.post<LoginResponse["data"]>("/user/login", data);
+      return request.post<LoginResponse["data"]>(
+        `/user/${userType}/login`,
+        data
+      );
     },
     onSuccess: (data) => {
       // 登录成功后的操作
-      const { token, redirect_url } = data;
+      const { token, redirect_url, role } = data;
       const { access_token, refresh_token, token_type, expire_in } = token;
       toast.success("Login success!");
       // 保存 token 到 localStorage
@@ -38,6 +42,7 @@ export const useLogin = () => {
       localStorage.setItem("refresh_token", refresh_token);
       localStorage.setItem("token_type", token_type);
       localStorage.setItem("expire_in", expire_in.toString());
+      localStorage.setItem("role", role);
       // 清除之前的查询缓存
       queryClient.clear();
       // 跳转到首页或其他页面

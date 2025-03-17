@@ -14,7 +14,7 @@ import {
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { DottedSeparator } from "@/components/dotted-separator";
+import { DottedSeparator } from "@/components/common/dotted-separator";
 
 import {
   ADVENTURER_AVATAR,

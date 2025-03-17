@@ -1,0 +1,53 @@
+/* 自定义 Allotment 拖拽区域样式 */
+:root {
+  --focus-border: #3b82f6; /* 蓝色 */
+  --separator-border: rgba(128, 128, 128, 0.5); /* 更明显的分隔线 */
+  --sash-hover-transition-duration: 0.2s; /* 稍微慢一点的过渡效果 */
+}
+
+/* 拖拽区域样式 */
+.sash {
+  position: relative;
+}
+
+.sash-hover {
+  background-color: var(--focus-border) !important;
+  opacity: 0.3;
+}
+
+/* 添加拖拽提示图标 */
+.sash-vertical::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='6' r='1'%3E%3C/circle%3E%3Ccircle cx='12' cy='12' r='1'%3E%3C/circle%3E%3Ccircle cx='12' cy='18' r='1'%3E%3C/circle%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0;
+  transition: opacity var(--sash-hover-transition-duration);
+  pointer-events: none;
+}
+
+.sash-vertical:hover::after {
+  opacity: 1;
+}
+  
+
+.sash-vertical:hover::before {
+  opacity: 1;
+}
+
+/* 暗色模式 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --separator-border: rgba(128, 128, 128, 0.7); /* 暗色模式下更明显的分隔线 */
+  }
+  
+  .sash-vertical::before {
+    color: #9ca3af;
+  }
+} 
