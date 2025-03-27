@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useStudentCourseStore } from "@/feature/course/student-store";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -22,6 +22,7 @@ import {
   XCircle,
   Award,
   Star,
+  Play,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -35,7 +36,7 @@ import {
 import { request, fetchSSE } from "@/lib/request";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { Allotment } from "allotment";
+import { Allotment, LayoutPriority } from "allotment";
 import "allotment/dist/style.css";
 // 导入自定义拖拽区域样式
 import "@/feature/course/allotment-custom.css";
@@ -43,6 +44,9 @@ import "@/feature/course/allotment-custom.css";
 export const Route = createFileRoute("/student/course/section/exercise")({
   component: ExerciseDetail,
 });
+
+import { sqlService, SQLResult } from "@/feature/course/sql-service";
+import { SQLResults } from "@/feature/course/components/sql-results";
 
 // 添加历史记录类型定义
 interface SubmissionHistory {
@@ -100,7 +104,7 @@ function ExerciseDetail() {
     useStudentCourseStore();
   const [code, setCode] = useState("");
   const [currentEditingCode, setCurrentEditingCode] = useState("");
-  const [language, setLanguage] = useState("javascript");
+  const [language, setLanguage] = useState<"javascript" | "python" | "java" | "sql">("javascript");
   const [submissionHistory, setSubmissionHistory] = useState<
     SubmissionHistory[]
   >([]);
@@ -129,6 +133,9 @@ function ExerciseDetail() {
   const dialogContentRef = useRef<HTMLDivElement>(null);
   const [isGeneratingReview, setIsGeneratingReview] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isExecutingSql, setIsExecutingSql] = useState(false);
+  const [sqlResults, setSqlResults] = useState<SQLResult[]>();
+  const [sqlError, setSqlError] = useState<string>();
 
   // 获取答题历史记录
   const fetchSubmissionHistory = async () => {
@@ -489,11 +496,44 @@ ${code}
                 <DropdownMenuItem onClick={() => setLanguage("java")}>
                   Java
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage("sql")}>
+                  SQL
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button variant="outline" size="sm" onClick={() => {}}>
-              <Save className="w-4 h-4" />
-            </Button>
+            {language === "sql" ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={async () => {
+                  setIsExecutingSql(true);
+                  setSqlError(undefined);
+                  try {
+                    const response = await sqlService.execute(code);
+                    if (response.success && response.data) {
+                      setSqlResults(response.data);
+                    } else {
+                      setSqlError(response.error);
+                    }
+                  } catch (error) {
+                    setSqlError(error instanceof Error ? error.message : "执行失败");
+                  } finally {
+                    setIsExecutingSql(false);
+                  }
+                }}
+                disabled={isExecutingSql || !code.trim()}
+              >
+                {isExecutingSql ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Play className="w-4 h-4" />
+                )}
+              </Button>
+            ) : (
+              <Button variant="outline" size="sm" onClick={() => {}}>
+                <Save className="w-4 h-4" />
+              </Button>
+            )}
             <Button
               variant="default"
               size="sm"
@@ -999,8 +1039,8 @@ ${code}
                 </div>
               </Allotment.Pane>
               <Allotment.Pane minSize={300}>
-                {/* 代码编辑器 */}
-                <div className="flex-1 overflow-hidden h-full">
+                {/* 代码编辑器和SQL结果 */}
+                <div className="flex flex-col h-full overflow-hidden">
                   {selectedHistoryId && (
                     <div className="bg-yellow-50 dark:bg-yellow-900/20 px-4 py-2 flex items-center justify-between">
                       <div className="flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-200">
@@ -1016,12 +1056,34 @@ ${code}
                       </Button>
                     </div>
                   )}
-                  <CodeEditor
-                    value={code}
-                    onChange={(value) => setCode(value || "")}
-                    language={language}
-                    readOnly={false}
-                  />
+                  {language === "sql" ? (
+                    <Allotment vertical>
+                      <Allotment.Pane>
+                        <CodeEditor
+                          value={code}
+                          onChange={(value) => setCode(value || "")}
+                          language="sql"
+                          readOnly={false}
+                        />
+                      </Allotment.Pane>
+                      <Allotment.Pane priority={LayoutPriority.Low}>
+                        <div className="h-full overflow-auto border-t dark:border-gray-800">
+                          <SQLResults
+                            isLoading={isExecutingSql}
+                            error={sqlError}
+                            results={sqlResults}
+                          />
+                        </div>
+                      </Allotment.Pane>
+                    </Allotment>
+                  ) : (
+                    <CodeEditor
+                      value={code}
+                      onChange={(value) => setCode(value || "")}
+                      language={language}
+                      readOnly={false}
+                    />
+                  )}
                 </div>
               </Allotment.Pane>
             </Allotment>
