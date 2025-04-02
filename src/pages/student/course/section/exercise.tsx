@@ -136,6 +136,7 @@ function ExerciseDetail() {
   const [isExecutingSql, setIsExecutingSql] = useState(false);
   const [sqlResults, setSqlResults] = useState<SQLResult[]>();
   const [sqlError, setSqlError] = useState<string>();
+  const [sqlExecutionTime, setSqlExecutionTime] = useState<number>();
 
   // 获取答题历史记录
   const fetchSubmissionHistory = async () => {
@@ -227,7 +228,7 @@ function ExerciseDetail() {
     try {
       await fetchSSE("/user/chat", {
         body: {
-          content: prompt,
+          content: "回答下面的问题 不要超过给出建议超出10点 总共不要超出500字"+prompt,
           memorized: true,
         },
         onMessage: (text: string) => {
@@ -502,33 +503,87 @@ ${code}
               </DropdownMenuContent>
             </DropdownMenu>
             {language === "sql" ? (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={async () => {
-                  setIsExecutingSql(true);
-                  setSqlError(undefined);
-                  try {
-                    const response = await sqlService.execute(code);
-                    if (response.success && response.data) {
-                      setSqlResults(response.data);
-                    } else {
-                      setSqlError(response.error);
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={async (event: React.MouseEvent<HTMLButtonElement>) => {
+                    if (!sqlService.isSampleDataInitialized()) {
+                      await sqlService.initSampleData();
                     }
-                  } catch (error) {
-                    setSqlError(error instanceof Error ? error.message : "执行失败");
-                  } finally {
-                    setIsExecutingSql(false);
-                  }
-                }}
-                disabled={isExecutingSql || !code.trim()}
-              >
-                {isExecutingSql ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Play className="w-4 h-4" />
-                )}
-              </Button>
+                    const examples = sqlService.getJoinExamples();
+                    
+                    // 展示查询示例供选择
+                    const menu = document.createElement('div');
+                    menu.style.position = 'absolute';
+                    menu.style.zIndex = '1000';
+                    menu.className = 'bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-1 min-w-[200px]';
+                    
+                    examples.forEach((example) => {
+                      const item = document.createElement('button');
+                      item.className = 'w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-100 dark:hover:bg-gray-700';
+                      item.textContent = example.title;
+                      item.onclick = () => {
+                        setCode(example.sql);
+                        document.body.removeChild(menu);
+                      };
+                      menu.appendChild(item);
+                    });
+                    
+                    // 定位到按钮下方
+                    const rect = (event.target as HTMLElement).getBoundingClientRect();
+                    menu.style.top = `${rect.bottom + 5}px`;
+                    menu.style.left = `${rect.left}px`;
+                    
+                    document.body.appendChild(menu);
+                    
+                    // 点击其他地方关闭菜单
+                    const closeMenu = (e: MouseEvent) => {
+                      if (!menu.contains(e.target as Node)) {
+                        document.body.removeChild(menu);
+                        document.removeEventListener('click', closeMenu);
+                      }
+                    };
+                    // 延迟添加事件监听，避免立即触发
+                    setTimeout(() => {
+                      document.addEventListener('click', closeMenu);
+                    }, 0);
+                  }}
+                  className="gap-2"
+                >
+                  <Bot className="w-4 h-4" />
+                  查询示例
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={async () => {
+                    setIsExecutingSql(true);
+                    setSqlError(undefined);
+                    try {
+                      const response = await sqlService.execute(code);
+                        if (response.success && response.data) {
+                          setSqlResults(response.data);
+                          setSqlExecutionTime(response.executionTime);
+                        } else {
+                          setSqlError(response.error);
+                        }
+                    } catch (error) {
+                      setSqlError(error instanceof Error ? error.message : "执行失败");
+                    } finally {
+                      setIsExecutingSql(false);
+                    }
+                  }}
+                  disabled={isExecutingSql || !code.trim()}
+                >
+                  {isExecutingSql ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Play className="w-4 h-4" />
+                  )}
+                </Button>
+              </>
             ) : (
               <Button variant="outline" size="sm" onClick={() => {}}>
                 <Save className="w-4 h-4" />
@@ -1072,6 +1127,7 @@ ${code}
                             isLoading={isExecutingSql}
                             error={sqlError}
                             results={sqlResults}
+                            executionTime={sqlExecutionTime}
                           />
                         </div>
                       </Allotment.Pane>
