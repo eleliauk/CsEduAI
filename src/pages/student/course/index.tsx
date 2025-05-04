@@ -98,7 +98,10 @@ function StudentCourseList() {
         if (data.code === 200) {
           setCourses(data.data.courses);
           setTotalCourses(data.data.total);
-        } else {
+        } else if (data.code === 401)
+       {
+          navigate({ to: "/login" });
+        }   else{
           console.error("获取课程失败:", data.message);
         }
       } catch (error) {
@@ -170,13 +173,12 @@ function StudentCourseList() {
             <h1
               className={`text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-primary via-blue-600 to-primary bg-clip-text text-transparent mb-6 leading-tight transition-all duration-700 ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
             >
-              基于大模型的计算机专业辅助教学系统
+           唯思启联:AI赋能的普惠教育平台
             </h1>
             <p
               className={`text-lg md:text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto transition-all duration-700 delay-100 ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
             >
-              利用先进的AI技术，为计算机专业学生提供个性化学习体验，
-              帮助你掌握前沿技术，提升编程能力
+             以“技术赋能教育普惠”为核心，构建双向赋能的可持续生态，推动前沿技术下沉至校园真实场景。
             </p>
 
             {/* 搜索框 */}

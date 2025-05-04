@@ -41,7 +41,7 @@ function LoginPage() {
                 <GalleryVerticalEnd className="size-5" />
               </div>
               <span className="flex items-center font-semibold text-lg">
-                基于大模型的计算机专业辅助教学系统
+              唯思启联（WiseChain）：AI赋能的普惠教育平台
               </span>
             </Link>
           </motion.div>
@@ -75,7 +75,7 @@ function LoginPage() {
                   智能学习，从这里开始
                 </h2>
                 <p className="text-muted-foreground text-lg">
-                  基于大模型的计算机专业辅助教学系统，为您提供个性化学习体验
+                唯思启联（WiseChain）：AI赋能的普惠教育平台，为您提供个性化学习体验
                 </p>
               </motion.div>
             </div>

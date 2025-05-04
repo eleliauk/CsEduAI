@@ -917,7 +917,7 @@ ${selectedText}
                     </div>
 
                     {/* 视频播放器 */}
-                    <div className="aspect-video bg-black">
+                    <div className="aspect-video bg-black" id="screen">
                       <iframe
                         src={currentSection.video_url}
                         scrolling="no"
