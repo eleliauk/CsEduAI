@@ -3,9 +3,17 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
+import loader from "@monaco-editor/loader";
 
 // 导入全局样式
 import "./styles/global.css";
+
+// 配置 Monaco Editor loader
+loader.config({
+  paths: {
+    vs: '/node_modules/monaco-editor/min/vs'
+  },
+});
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";

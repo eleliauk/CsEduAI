@@ -41,7 +41,7 @@ function CourseList() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | undefined>();
-  const [platorms,setPlatforms] = useState<Course[]>([{
+  const [platorms,_setPlatforms] = useState<Course[]>([{
     id:0,
     cover:'https://openinula-website.obs.ap-southeast-1.myhuaweicloud.com/img/course.inula.1.png',
     created_at:0,

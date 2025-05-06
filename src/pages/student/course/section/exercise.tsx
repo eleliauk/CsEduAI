@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useStudentCourseStore } from "@/feature/course/student-store";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -114,9 +114,9 @@ function ExerciseDetail() {
   const [messages, setMessages] = useState<AiMessage[]>([]);
   const [prompt, setPrompt] = useState("");
   const [isAiLoading, setIsAiLoading] = useState(false);
-  const [aiContent, setAiContent] = useState("");
-  const [thinking, setThinking] = useState("");
-  const [tipInfo, setTipInfo] = useState<{ totalTime?: number }>({});
+  const [_aiContent, setAiContent] = useState("");
+  const [_thinking, setThinking] = useState("");
+  const [_tipInfo, setTipInfo] = useState<{ totalTime?: number }>({});
 
   // 评分数据
   const [reviewScores, setReviewScores] = useState<{

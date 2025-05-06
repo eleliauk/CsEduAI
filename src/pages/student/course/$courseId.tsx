@@ -2,7 +2,7 @@ import {
   ArrowLeft,
   Book,
   Calendar,
-  GraduationCap,
+  //GraduationCap,
   ListOrdered,
   Users,
   Brain,

@@ -5,6 +5,7 @@ import react from "@vitejs/plugin-react";
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: "./", // 确保资源使用相对路径
   plugins: [
     react(),
     TanStackRouterVite({
@@ -21,14 +22,27 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          jsonWorker: ["monaco-editor/esm/vs/language/json/json.worker"],
-          cssWorker: ["monaco-editor/esm/vs/language/css/css.worker"],
-          htmlWorker: ["monaco-editor/esm/vs/language/html/html.worker"],
-          tsWorker: ["monaco-editor/esm/vs/language/typescript/ts.worker"],
-          editorWorker: ["monaco-editor/esm/vs/editor/editor.worker"],
-        },
-      },
-    },
+        manualChunks: (id) => {
+          if (id.includes('node_modules/monaco-editor')) {
+            if (id.includes('/esm/vs/editor/editor.worker')) {
+              return 'monaco-editor-worker';
+            }
+            if (id.includes('/esm/vs/language/json/json.worker')) {
+              return 'monaco-json-worker';
+            }
+            if (id.includes('/esm/vs/language/css/css.worker')) {
+              return 'monaco-css-worker';
+            }
+            if (id.includes('/esm/vs/language/html/html.worker')) {
+              return 'monaco-html-worker';
+            }
+            if (id.includes('/esm/vs/language/typescript/ts.worker')) {
+              return 'monaco-ts-worker';
+            }
+            return 'monaco-editor';
+          }
+        }
+      }
+    }
   },
 });

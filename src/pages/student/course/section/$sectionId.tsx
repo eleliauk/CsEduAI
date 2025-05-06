@@ -47,7 +47,7 @@ function StudentSectionDetail() {
   const { sectionId } = useParams({
     from: "/student/course/section/$sectionId",
   });
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [_isLoaded, setIsLoaded] = useState(false);
   const {
     currentCourse,
     currentSection,
