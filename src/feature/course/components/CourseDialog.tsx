@@ -101,7 +101,7 @@ export function CourseDialog({
         const formData = new FormData();
         formData.append("file", selectedFile);
         const res = await fetch(
-          "http://47.120.14.30:8080/api/v1/user/oss/upload",
+          "https://wishchain.muxi.org.cn/api/v1/user/oss/upload",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,

@@ -35,7 +35,7 @@ class RequestService {
 
   constructor() {
     this.instance = axios.create({
-      baseURL: "http://47.120.14.30:8083/api/v1",
+      baseURL: "https://wishchain.muxi.org.cn/api/v1",
       timeout: 0,
       headers: {
         "Content-Type": "application/json",

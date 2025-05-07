@@ -84,7 +84,7 @@ function StudentCourseList() {
         }
 
         const response = await fetch(
-          `http://47.120.14.30:8083/api/v1/user/student/courses?page_index=${pageIndex}&page_size=${pageSize}`,
+          `https://wishchain.muxi.org.cn/api/v1/user/student/courses?page_index=${pageIndex}&page_size=${pageSize}`,
           {
             headers: {
               accept: "application/json",
